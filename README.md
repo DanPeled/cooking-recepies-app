@@ -9,8 +9,8 @@
     <li>glob</li>
 </ul>
 <h2>Usage</h2>
-<p>To run the program, execute the following command:</p><div class="p-4 overflow-y-auto"><code class="!whitespace-pre hljs">python recipe_book.py
-</code></div>
+<p>To run the program, execute the following command:</p>
+<code>python recipe_book.py</code>
 <p>Upon running the program, you will be presented with a main window that allows you to either view a list of recipes
     or create a new recipe.</p>
 <h3>Viewing Recipes</h3>
