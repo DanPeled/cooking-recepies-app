@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.font as tkFont
 import os
+import glob
 root = tk.Tk()
 # setting title
 root.title("Recepie Book")
@@ -14,8 +15,8 @@ alignstr = '%dx%d+%d+%d' % (width, height,
 root.geometry(alignstr)
 root.resizable(width=False, height=False)
 
-
 def recepie_window(recepie: str = "NONE"):
+    change_window()
     Title_Lable = tk.Label(root)
     ft = tkFont.Font(family='Times', size=18)
     Title_Lable["font"] = ft
@@ -35,12 +36,40 @@ def recepie_window(recepie: str = "NONE"):
     CANCEL_BTN["text"] = "Back"
     CANCEL_BTN["relief"] = "flat"
     CANCEL_BTN.place(x=20, y=560, width=70, height=25)
-    CANCEL_BTN["command"] = main
+    CANCEL_BTN["command"] = recepie_list_window
 
 
 def recepie_list_window():
+    def generate_buttons(names: list[str]):
+        def recepie_window_cmd(name):
+            """Makes a command to handle the command attribute correctly
+            Args:
+                name (list of strings) : handles the names of the recepies
+            """
+            def cmd():
+                recepie_window(name)
+            return cmd
+        y_pos = 50
+        x_pos = 250
+        buttons: list[tk.Button] = []
+        # Makes a button for each recepie that exists
+        for i, name in enumerate(names):
+            buttons.append(tk.Button(root, cursor="hand2"))
+            buttons[i]["activebackground"] = "#bcbcbc"
+            buttons[i]["activeforeground"] = "#e3e3e3"
+            buttons[i]["bg"] = "#7b7b7b"
+            ft = tkFont.Font(family='Times', size=13)
+            buttons[i]["font"] = ft
+            buttons[i]["fg"] = "#000000"
+            buttons[i]["justify"] = "center"
+            buttons[i]["text"] = name.capitalize()
+            buttons[i]["relief"] = "flat"
+            buttons[i].place(x=x_pos, y=y_pos, width=len(name)
+                             * 10 + 20, height=40)
+            buttons[i]["command"] = recepie_window_cmd(name)
+            y_pos += 50
     Title_Lable = tk.Label(root)
-    ft = tkFont.Font(family='Times', size=18)
+    ft = tkFont.Font(family='Times', size=18, weight='bold')
     Title_Lable["font"] = ft
     Title_Lable["fg"] = "#333333"
     Title_Lable["justify"] = "center"
@@ -59,9 +88,21 @@ def recepie_list_window():
     CANCEL_BTN["relief"] = "flat"
     CANCEL_BTN.place(x=20, y=560, width=70, height=25)
     CANCEL_BTN["command"] = main
+    if not os.path.exists('recepies/'):
+        # Checks wheter the recepies dir exists, and if doesn't creates it
+        os.makedirs('recepies/')
+    # Gets all the existing recepie files in the recepies dir
+    recepies_files = glob.glob("recepies/*.recepie")
+    recepies_files = [
+        recepie.replace("recepies\\", "").replace(".recepie", "") for recepie in recepies_files
+    ]  # Removes "recepies\\" and file extension from the recepie name
+    generate_buttons(recepies_files)
 
 
 def change_window():
+    """
+    Goes through each widget in the current window and destroys it
+    """
     for widgets in root.winfo_children():
         widgets.destroy()
 
@@ -73,13 +114,8 @@ def main():
 
     def recpie_list():
         change_window()
-        recepie_window()
+        recepie_list_window()
     change_window()
-    # sets the title of the
-    # Toplevel widget
-
-    # sets the geometry of toplevel
-
     # A Label widget to show in toplevel
     tk.Label(root,
              text="This is a new window").pack()
@@ -87,7 +123,7 @@ def main():
     root.title("Recepie Book")
 
     GLabel_222 = tk.Label(root)
-    ft = tkFont.Font(family='Times', size=18)
+    ft = tkFont.Font(family='Times', size=18, weight="bold")
     GLabel_222["font"] = ft
     GLabel_222["fg"] = "#333333"
     GLabel_222["justify"] = "center"
@@ -149,7 +185,7 @@ def create_recepie():
         # be treated as a new window
 
     TITLE_TEXT = tk.Label(root)
-    ft = tkFont.Font(family='Times', size=18)
+    ft = tkFont.Font(family='Times', size=18, weight="bold")
     TITLE_TEXT["font"] = ft
     TITLE_TEXT["fg"] = "#333333"
     TITLE_TEXT["justify"] = "center"
