@@ -2,6 +2,8 @@ import tkinter as tk
 import tkinter.font as tkFont
 import os
 import glob
+import json
+
 root = tk.Tk()
 # setting title
 root.title("Recepie Book")
@@ -15,7 +17,8 @@ alignstr = '%dx%d+%d+%d' % (width, height,
 root.geometry(alignstr)
 root.resizable(width=False, height=False)
 
-def recepie_window(recepie: str = "NONE"):
+
+def recepie_window(recepie: str = "NONE", recepie_dict: dict = {}):
     change_window()
     Title_Lable = tk.Label(root)
     ft = tkFont.Font(family='Times', size=18)
@@ -24,6 +27,14 @@ def recepie_window(recepie: str = "NONE"):
     Title_Lable["justify"] = "center"
     Title_Lable["text"] = f"{recepie.capitalize()}"
     Title_Lable.place(x=0, y=0, width=588, height=34)
+
+    Description_Label = tk.Label(root)
+    ft = tkFont.Font(family="Times", size=15)
+    Description_Label["font"] = ft
+    Description_Label["fg"] = "#333333"
+    Description_Label["justify"] = "left"
+    Description_Label["text"] = f"{recepie_dict.get('description','')}"
+    Description_Label.place(x=-200, y=100, width=588, height=34)
 
     CANCEL_BTN = tk.Button(root, cursor="hand2")
     CANCEL_BTN["activebackground"] = "#bcbcbc"
@@ -40,20 +51,27 @@ def recepie_window(recepie: str = "NONE"):
 
 
 def recepie_list_window():
+    change_window()
+
     def generate_buttons(names: list[str]):
-        def recepie_window_cmd(name):
+        def recepie_window_cmd(name, recepie_dict):
             """Makes a command to handle the command attribute correctly
             Args:
                 name (list of strings) : handles the names of the recepies
             """
             def cmd():
-                recepie_window(name)
+                recepie_window(name, recepie_dict)
             return cmd
         y_pos = 50
         x_pos = 250
         buttons: list[tk.Button] = []
         # Makes a button for each recepie that exists
         for i, name in enumerate(names):
+            recepie_dict = {}
+            with open(f"recepies/{name}.recepie") as f:
+                recepie_dict = f.read()
+                print(recepie_dict)
+            f.close()
             buttons.append(tk.Button(root, cursor="hand2"))
             buttons[i]["activebackground"] = "#bcbcbc"
             buttons[i]["activeforeground"] = "#e3e3e3"
@@ -66,7 +84,8 @@ def recepie_list_window():
             buttons[i]["relief"] = "flat"
             buttons[i].place(x=x_pos, y=y_pos, width=len(name)
                              * 10 + 20, height=40)
-            buttons[i]["command"] = recepie_window_cmd(name)
+            buttons[i]["command"] = recepie_window_cmd(
+                name, eval(recepie_dict))
             y_pos += 50
     Title_Lable = tk.Label(root)
     ft = tkFont.Font(family='Times', size=18, weight='bold')
@@ -175,10 +194,11 @@ def create_recepie():
         recepie = {"title": title, "description": description, "preperation": preperation,
                    "servings": servings, "ingridients": ingridients, "directions": directions,
                    "notes": notes}
+        recepie_str = json.dumps(recepie, indent=1)
         if not os.path.exists(f"recepies/{title}.recepie"):
             open(f"recepies/{title}.recepie", "w").close()
         with open(f"recepies/{title}.recepie", "w+") as file:
-            file.write(str(recepie))
+            file.write(recepie_str)
         change_window()
         main()
         # Toplevel object which will
